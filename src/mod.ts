@@ -1,23 +1,7 @@
-const method = "POST";
 import { sha256 } from "./deps.ts";
 import { toAmz, toDateStamp } from "./date.ts";
 import { getSignatureKey, signAwsV4 } from "./signing.ts";
 import { Credentials } from "./types.ts";
-
-const endpoint =
-  "https://search-jurassi-elasti-637ekxnqkku7-ck3h4rezux6u2m6gfwfrb2ipfm.ap-southeast-2.es.amazonaws.com/repo_index/repo/_search";
-
-const payload = {
-  query: {
-    multi_match: {
-      query: "comprihensiv guide",
-      fields: ["title", "summary"],
-      fuzziness: "AUTO",
-    },
-  },
-  _source: ["title", "summary", "publish_date"],
-  size: 1,
-};
 
 export class AWSSignerV4 {
   private region: string;

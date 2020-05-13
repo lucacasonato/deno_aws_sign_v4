@@ -2,6 +2,12 @@
 
 > Generates AWS Signature V4 for AWS low-level REST APIs.
 
+## Installation
+
+```javascript
+import { AWSSignerV4 } from "https://raw.githubusercontent.com/silver-xu/deno-aws-sign-v4/master/src/mod.ts";
+```
+
 ## Region & Credentials
 
 The below example will generate signed headers based on the region and credentials in following ENV variables:
