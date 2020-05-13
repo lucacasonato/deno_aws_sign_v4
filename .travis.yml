@@ -1,0 +1,10 @@
+language: ruby
+
+services:
+  - docker
+
+before_install:
+  - docker build -t silver-xu/deno-aws-sign-v4 .
+
+script:
+  - docker run silver-xu/deno-aws-sign-v4
