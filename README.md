@@ -23,7 +23,7 @@ const headers = signer.sign("es", endpoint, "POST", payload);
 const response = await fetch(endpoint, {
   headers
   method,
-  body: JSON.stringify(payload),
+  body: payload,
 });
 
 ```
@@ -43,7 +43,7 @@ const headers = signer.sign("es", endpoint, "POST", payload);
 const response = await fetch(endpoint, {
   headers
   method,
-  body: JSON.stringify(payload),
+  body: payload,
 });
 
 ```

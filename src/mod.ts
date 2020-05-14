@@ -19,14 +19,14 @@ export class AWSSignerV4 {
    * @param  {string} service - the aws service,. eg: es for elastic search, dynamodb for Dynamo Db
    * @param  {string} url - request url to sign
    * @param  {string="GET"} method - request method to sign, default to GET
-   * @param  {any=undefined} body - the body of PUT/POST methods, default to undefined
+   * @param  {string | undefined} body - the body of PUT/POST methods, default to undefined
    * @returns {RequestHeaders} - the signed request headers
    */
   public sign = (
     service: string,
     url: string,
     method: string = "GET",
-    body: any = undefined
+    body?: string
   ): RequestHeaders => {
     const date = new Date();
     const amzdate = toAmz(date);
@@ -39,7 +39,7 @@ export class AWSSignerV4 {
     const canonicalHeaders = `host:${host}\nx-amz-date:${amzdate}\n`;
     const signedHeaders = "host;x-amz-date";
 
-    const payload = body ? JSON.stringify(body) : "";
+    const payload = body ?? "";
     const payloadHash = sha256(payload, "utf8", "hex") as string;
 
     const { awsAccessKeyId, awsSecretKey } = this.credentials;
