@@ -73,7 +73,7 @@ export class AWSSignerV4 {
 
     const sessionToken = Deno.env.get("AWS_SESSION_TOKEN");
     if (sessionToken) {
-      headers["X-Amz-Security-Token"] = sessionToken!;
+      headers["X-Amz-Security-Token"] = sessionToken;
     }
 
     return headers;
