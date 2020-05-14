@@ -66,7 +66,7 @@ export class AWSSignerV4 {
 
     const authHeader = `${algorithm} Credential=${awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
-    const headers = {
+    const headers: RequestHeaders = {
       "x-amz-date": amzdate,
       Authorization: authHeader,
     };
