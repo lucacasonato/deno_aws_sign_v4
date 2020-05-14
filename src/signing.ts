@@ -1,6 +1,11 @@
 import { hmac, encode } from "./deps.ts";
 const AWS4: Uint8Array = encode("AWS4", "utf8");
 
+/**
+ * @param  {string|Uint8Array} key - the key to sign aws v4 signature
+ * @param  {string} msg - the message to sign
+ * @returns {string|Uint8Array} - signature
+ */
 export const signAwsV4 = (
   key: string | Uint8Array,
   msg: string
@@ -8,12 +13,19 @@ export const signAwsV4 = (
   return hmac("sha256", key, msg, undefined, "hex");
 };
 
+/**
+ * @param  {string|Uint8Array} key - the key to generate signature key
+ * @param  {string} dateStamp - dateStamp in ISO format
+ * @param  {string} region - aws region
+ * @param  {string} service - aws service
+ * @returns {string|Uint8Array} - generated key
+ */
 export const getSignatureKey = (
   key: string | Uint8Array,
   dateStamp: string,
   region: string,
   service: string
-) => {
+): string | Uint8Array => {
   if (typeof key === "string") {
     key = encode(key, "utf8") as Uint8Array;
   }

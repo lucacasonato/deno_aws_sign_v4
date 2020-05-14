@@ -1,23 +1,33 @@
 import { sha256 } from "./deps.ts";
 import { toAmz, toDateStamp } from "./date.ts";
 import { getSignatureKey, signAwsV4 } from "./signing.ts";
-import { Credentials } from "./types.ts";
+import { Credentials, RequestHeaders } from "./types.ts";
 
 export class AWSSignerV4 {
   private region: string;
   private credentials: Credentials;
 
+  /**
+   * @param  {string} region - the aws region
+   * @param  {Credentials} credentials - the aws credentials
+   */
   constructor(region?: string, credentials?: Credentials) {
     this.region = region || this.getDefaultRegion();
     this.credentials = credentials || this.getDefaultCredentials();
   }
-
+  /**
+   * @param  {string} service - the aws service,. eg: es for elastic search, dynamodb for Dynamo Db
+   * @param  {string} url - request url to sign
+   * @param  {string="GET"} method - request method to sign, default to GET
+   * @param  {any=undefined} body - the body of PUT/POST methods, default to undefined
+   * @returns {RequestHeaders} - the signed request headers
+   */
   public sign = (
     service: string,
     url: string,
     method: string = "GET",
     body: any = undefined
-  ) => {
+  ): RequestHeaders => {
     const date = new Date();
     const amzdate = toAmz(date);
     const datestamp = toDateStamp(date);
