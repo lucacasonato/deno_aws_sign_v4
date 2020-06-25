@@ -27,7 +27,7 @@ export class AWSSignerV4 {
     url: string,
     method: string = "GET",
     headers: { [key: string]: string },
-    body?: Uint8Array | string
+    body?: Uint8Array | string,
   ): RequestHeaders => {
     const date = new Date();
     const amzdate = toAmz(date);
@@ -39,7 +39,7 @@ export class AWSSignerV4 {
 
     headers["x-amz-date"] = amzdate;
 
-    let canonicalHeaders = `host:${host}`;
+    let canonicalHeaders = `host:${host}\n`;
     let signedHeaders = "host;";
     for (const key in headers) {
       canonicalHeaders += `${key}:${headers[key]}\n`;
