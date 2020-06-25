@@ -45,7 +45,7 @@ export class AWSSignerV4 {
       canonicalHeaders += `${key}:${headers[key]}\n`;
       signedHeaders += `${key};`;
     }
-
+    signedHeaders = signedHeaders.substring(0, signedHeaders.length - 1);
     const payload = body ?? "";
     const payloadHash = sha256(payload, "utf8", "hex") as string;
 
