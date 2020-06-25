@@ -26,7 +26,8 @@ export class AWSSignerV4 {
     service: string,
     url: string,
     method: string = "GET",
-    body?: string
+    headers: { [key: string]: string },
+    body?: string,
   ): RequestHeaders => {
     const date = new Date();
     const amzdate = toAmz(date);
@@ -36,40 +37,47 @@ export class AWSSignerV4 {
     const { host, pathname, searchParams } = urlObj;
     const canonicalQuerystring = searchParams.toString();
 
-    const canonicalHeaders = `host:${host}\nx-amz-date:${amzdate}\n`;
-    const signedHeaders = "host;x-amz-date";
+    headers["x-amz-date"] = amzdate;
+
+    let canonicalHeaders = `host:${host}`;
+    let signedHeaders = "host;";
+    for (const key in headers) {
+      canonicalHeaders += `${key}:${headers[key]}\n`;
+      signedHeaders += `${key};`;
+    }
 
     const payload = body ?? "";
     const payloadHash = sha256(payload, "utf8", "hex") as string;
 
     const { awsAccessKeyId, awsSecretKey } = this.credentials;
 
-    const canonicalRequest = `${method}\n${pathname}\n${canonicalQuerystring}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+    const canonicalRequest =
+      `${method}\n${pathname}\n${canonicalQuerystring}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
     const canonicalRequestDigest = sha256(
       canonicalRequest,
       "utf8",
-      "hex"
+      "hex",
     ) as string;
 
     const algorithm = "AWS4-HMAC-SHA256";
-    const credentialScope = `${datestamp}/${this.region}/${service}/aws4_request`;
-    const stringToSign = `${algorithm}\n${amzdate}\n${credentialScope}\n${canonicalRequestDigest}`;
+    const credentialScope =
+      `${datestamp}/${this.region}/${service}/aws4_request`;
+    const stringToSign =
+      `${algorithm}\n${amzdate}\n${credentialScope}\n${canonicalRequestDigest}`;
 
     const signingKey = getSignatureKey(
       awsSecretKey,
       datestamp,
       this.region,
-      service
+      service,
     );
 
     const signature = signAwsV4(signingKey, stringToSign);
 
-    const authHeader = `${algorithm} Credential=${awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+    const authHeader =
+      `${algorithm} Credential=${awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
-    const headers: RequestHeaders = {
-      "x-amz-date": amzdate,
-      Authorization: authHeader,
-    };
+    headers.Authorization = authHeader;
 
     const sessionToken = Deno.env.get("AWS_SESSION_TOKEN");
     if (sessionToken) {
