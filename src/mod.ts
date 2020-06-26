@@ -38,6 +38,10 @@ export class AWSSignerV4 {
     const canonicalQuerystring = searchParams.toString();
 
     headers["x-amz-date"] = amzdate;
+    const sessionToken = Deno.env.get("AWS_SESSION_TOKEN");
+    if (sessionToken) {
+      headers["x-amz-security-token"] = sessionToken;
+    }
 
     let canonicalHeaders = `host:${host}\n`;
     let signedHeaders = "host;";
@@ -78,11 +82,6 @@ export class AWSSignerV4 {
       `${algorithm} Credential=${awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
     headers.Authorization = authHeader;
-
-    const sessionToken = Deno.env.get("AWS_SESSION_TOKEN");
-    if (sessionToken) {
-      headers["X-Amz-Security-Token"] = sessionToken;
-    }
 
     return headers;
   };
