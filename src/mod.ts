@@ -26,7 +26,7 @@ export class AWSSignerV4 {
     service: string,
     url: string,
     method: string = "GET",
-    body?: string
+    body?: Uint8Array | string
   ): RequestHeaders => {
     const date = new Date();
     const amzdate = toAmz(date);
