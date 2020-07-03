@@ -6,6 +6,7 @@ import { Credentials, RequestHeaders } from "./types.ts";
 export class AWSSignerV4 {
   private region: string;
   private credentials: Credentials;
+  private sessionToken: string;
 
   /**
    * @param  {string} region - the aws region
@@ -14,6 +15,7 @@ export class AWSSignerV4 {
   constructor(region?: string, credentials?: Credentials) {
     this.region = region || this.getDefaultRegion();
     this.credentials = credentials || this.getDefaultCredentials();
+    this.sessionToken = credentials ? null : Deno.env.get("AWS_SESSION_TOKEN");
   }
   /**
    * @param  {string} service - the aws service,. eg: es for elastic search, dynamodb for Dynamo Db
@@ -71,9 +73,8 @@ export class AWSSignerV4 {
       Authorization: authHeader,
     };
 
-    const sessionToken = Deno.env.get("AWS_SESSION_TOKEN");
-    if (sessionToken) {
-      headers["X-Amz-Security-Token"] = sessionToken;
+    if (this.sessionToken) {
+      headers["X-Amz-Security-Token"] = this.sessionToken;
     }
 
     return headers;
