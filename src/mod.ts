@@ -1,7 +1,7 @@
 import { sha256 } from "./deps.ts";
 import { toAmz, toDateStamp } from "./date.ts";
 import { getSignatureKey, signAwsV4 } from "./signing.ts";
-import { Credentials, RequestHeaders } from "./types.ts";
+import type { Credentials, RequestHeaders } from "./types.ts";
 
 export class AWSSignerV4 {
   private region: string;
