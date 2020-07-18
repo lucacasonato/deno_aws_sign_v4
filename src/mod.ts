@@ -43,9 +43,11 @@ export class AWSSignerV4 {
       headers["x-amz-security-token"] = sessionToken;
     }
 
-    let canonicalHeaders = `host:${host}\n`;
-    let signedHeaders = "host;";
-    for (const key in headers) {
+    headers["host"] = host;
+
+    let canonicalHeaders = "";
+    let signedHeaders = "";
+    for (const key of Object.keys(headers).sort()) {
       canonicalHeaders += `${key.toLowerCase()}:${headers[key]}\n`;
       signedHeaders += `${key.toLowerCase()};`;
     }
