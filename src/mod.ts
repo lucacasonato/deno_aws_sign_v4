@@ -46,8 +46,8 @@ export class AWSSignerV4 {
     let canonicalHeaders = `host:${host}\n`;
     let signedHeaders = "host;";
     for (const key in headers) {
-      canonicalHeaders += `${key}:${headers[key]}\n`;
-      signedHeaders += `${key};`;
+      canonicalHeaders += `${key.toLowerCase()}:${headers[key]}\n`;
+      signedHeaders += `${key.toLowerCase()};`;
     }
     signedHeaders = signedHeaders.substring(0, signedHeaders.length - 1);
     const payload = body ?? "";
