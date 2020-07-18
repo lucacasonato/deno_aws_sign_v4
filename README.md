@@ -1,4 +1,7 @@
-# deno-aws-signer-v4 [![Build Status](https://travis-ci.org/silver-xu/deno-aws-sign-v4.svg?branch=master)](https://travis-ci.org/silver-xu/deno-aws-sign-v4)
+# deno-aws-signer-v4
+
+![ci](https://github.com/denoland/deno/workflows/ci/badge.svg)
+[![deno doc](https://doc.deno.land/badge.svg)](https://raw.githubusercontent.com/silver-xu/deno-aws-sign-v4/master/src/mod.ts)
 
 > Generates AWS Signature V4 for AWS low-level REST APIs.
 
@@ -14,18 +17,18 @@ The below example will generate signed headers based on the region and credentia
 
 - AWS_ACCESS_KEY_ID
 - AWS_SECRET_ACCESS_KEY
+- AWS_SESSION_TOKEN
 - AWS_REGION
 
 ```javascript
 const signer = new AWSSignerV4();
-const headers = signer.sign("es", endpoint, "POST", payload);
+const signedHeaders = signer.sign("es", endpoint, "POST", headers, payload);
 
 const response = await fetch(endpoint, {
-  headers
+  headers: signedHeaders,
   method,
   body: payload,
 });
-
 ```
 
 ## Complete setup
@@ -38,10 +41,10 @@ const signer = new AWSSignerV4(
     awsSecretKey: 1234 // Your real secret key
   });
 
-const headers = signer.sign("es", endpoint, "POST", payload);
+const signedHeaders = signer.sign("es", endpoint, "POST", headers, payload);
 
 const response = await fetch(endpoint, {
-  headers
+  headers: signedHeaders,
   method,
   body: payload,
 });

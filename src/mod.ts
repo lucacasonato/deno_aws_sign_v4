@@ -38,9 +38,8 @@ export class AWSSignerV4 {
     const canonicalQuerystring = searchParams.toString();
 
     headers["x-amz-date"] = amzdate;
-    const sessionToken = Deno.env.get("AWS_SESSION_TOKEN");
-    if (sessionToken) {
-      headers["x-amz-security-token"] = sessionToken;
+    if (this.credentials.awsSessionToken) {
+      headers["x-amz-security-token"] = this.credentials.awsSessionToken;
     }
 
     headers["host"] = host;
@@ -88,8 +87,9 @@ export class AWSSignerV4 {
     return headers;
   };
 
-  private getDefaultCredentials = () => {
-    const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = Deno.env.toObject();
+  private getDefaultCredentials = (): Credentials => {
+    const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN } = Deno
+      .env.toObject();
     if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
       throw new Error("Invalid Credentials");
     }
@@ -97,10 +97,11 @@ export class AWSSignerV4 {
     return {
       awsAccessKeyId: AWS_ACCESS_KEY_ID,
       awsSecretKey: AWS_SECRET_ACCESS_KEY,
+      awsSessionToken: AWS_SESSION_TOKEN,
     };
   };
 
-  private getDefaultRegion = () => {
+  private getDefaultRegion = (): string => {
     const { AWS_REGION } = Deno.env.toObject();
     if (!AWS_REGION) {
       throw new Error("Invalid Region");
