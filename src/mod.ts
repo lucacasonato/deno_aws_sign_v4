@@ -38,8 +38,8 @@ export class AWSSignerV4 {
     const canonicalQuerystring = searchParams.toString();
 
     headers["x-amz-date"] = amzdate;
-    if (this.credentials.awsSessionToken) {
-      headers["x-amz-security-token"] = this.credentials.awsSessionToken;
+    if (this.credentials.sessionToken) {
+      headers["x-amz-security-token"] = this.credentials.sessionToken;
     }
 
     headers["host"] = host;
@@ -97,7 +97,7 @@ export class AWSSignerV4 {
     return {
       awsAccessKeyId: AWS_ACCESS_KEY_ID,
       awsSecretKey: AWS_SECRET_ACCESS_KEY,
-      awsSessionToken: AWS_SESSION_TOKEN,
+      sessionToken: AWS_SESSION_TOKEN,
     };
   };
 
