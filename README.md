@@ -18,12 +18,16 @@ The below example will generate signed headers based on the region and credentia
 import { AWSSignerV4 } from "https://deno.land/x/aws_sign_v4@0.1.0/mod.ts";
 
 const signer = new AWSSignerV4();
-const signedHeaders = signer.sign("es", endpoint, "POST", headers, payload);
+const url = "https://test-bucket.s3.amazonaws.com/test";
+const method = "PUT";
+const body = new TextEncoder().encode("Hello World!")
+const headers = { "content-length": body.length };
+const signedHeaders = signer.sign("s3", url, method, headers, body);
 
-const response = await fetch(endpoint, {
-  headers: signedHeaders,
-  method,
-  body: payload,
+const response = await fetch(url, {
+   headers: signedHeaders,
+   method,
+   body: payload,
 });
 ```
 

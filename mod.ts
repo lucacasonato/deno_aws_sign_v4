@@ -2,31 +2,64 @@ import { sha256Hex } from "./deps.ts";
 import { toAmz, toDateStamp } from "./src/date.ts";
 import { getSignatureKey, signAwsV4 } from "./src/signing.ts";
 import type { Credentials, RequestHeaders } from "./src/types.ts";
+export type { Credentials, RequestHeaders };
 
+/**
+ * This class can be used to create AWS Signature V4
+ * for low-level AWS REST APIs. You can either provide
+ * credentials for this API using the options in the
+ * constructor, or let them be aquired automatically
+ * through environment variables.
+ * 
+ * Example usage:
+ * 
+ * ```ts 
+ * const signer = new AWSSignerV4();
+ * const url = "https://test-bucket.s3.amazonaws.com/test";
+ * const method = "PUT";
+ * const body = new TextEncoder().encode("Hello World!")
+ * const headers = { "content-length": body.length };
+ * const signedHeaders = signer.sign("s3", url, method, headers, body);
+ * 
+ * const response = await fetch(url, {
+ *   headers: signedHeaders,
+ *   method,
+ *   body: payload,
+ * });
+ * ```
+ */
 export class AWSSignerV4 {
   private region: string;
   private credentials: Credentials;
 
   /**
-   * @param  {string} region - the aws region
-   * @param  {Credentials} credentials - the aws credentials
+   * If no region or credentials are specified, they will
+   * automatically be aquired from environment variables.
+   * 
+   * Region is aquired from `AWS_REGION`. The credentials
+   * are acquired from `AWS_ACCESS_KEY_ID`,
+   * `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN`.
    */
   constructor(region?: string, credentials?: Credentials) {
-    this.region = region || this.getDefaultRegion();
-    this.credentials = credentials || this.getDefaultCredentials();
+    this.region = region || this.#getDefaultRegion();
+    this.credentials = credentials || this.#getDefaultCredentials();
   }
   /**
-   * @param  {string} service - the aws service,. eg: es for elastic search, dynamodb for Dynamo Db
-   * @param  {string} url - request url to sign
-   * @param  {string="GET"} method - request method to sign, default to GET
-   * @param  {string | undefined} body - the body of PUT/POST methods, default to undefined
+   * Use this to create the signed headers required to
+   * make a call to an AWS API.
+   * 
+   * @param service This is the AWS service, e.g. `s3` for s3, `dynamodb` for DynamoDB 
+   * @param url The URL for the request to sign.
+   * @param request The request method of the request to sign.
+   * @param headers Other headers to include while signing.
+   * @param body The body for PUT/POST methods.
    * @returns {RequestHeaders} - the signed request headers
    */
   public sign = (
     service: string,
     url: string,
     method: string = "GET",
-    headers: { [key: string]: string },
+    headers: RequestHeaders,
     body?: Uint8Array | string,
   ): RequestHeaders => {
     const date = new Date();
@@ -83,9 +116,10 @@ export class AWSSignerV4 {
     return headers;
   };
 
-  private getDefaultCredentials = (): Credentials => {
-    const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN } = Deno
-      .env.toObject();
+  #getDefaultCredentials = (): Credentials => {
+    const AWS_ACCESS_KEY_ID = Deno.env.get("AWS_ACCESS_KEY_ID");
+    const AWS_SECRET_ACCESS_KEY = Deno.env.get("AWS_SECRET_ACCESS_KEY");
+    const AWS_SESSION_TOKEN = Deno.env.get("AWS_SESSION_TOKEN");
 
     if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
       throw new Error("Invalid Credentials");
@@ -98,8 +132,8 @@ export class AWSSignerV4 {
     };
   };
 
-  private getDefaultRegion = (): string => {
-    const { AWS_REGION } = Deno.env.toObject();
+  #getDefaultRegion = (): string => {
+    const AWS_REGION = Deno.env.get("AWS_REGION");
     if (!AWS_REGION) {
       throw new Error("Invalid Region");
     }
