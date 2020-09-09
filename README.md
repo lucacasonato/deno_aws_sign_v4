@@ -7,7 +7,7 @@
 
 ## Installation
 
-```javascript
+```ts
 import { AWSSignerV4 } from "https://raw.githubusercontent.com/silver-xu/deno-aws-sign-v4/master/src/mod.ts";
 ```
 
@@ -50,3 +50,9 @@ const response = await fetch(endpoint, {
 });
 
 ```
+
+---
+
+The module is licenced under GPL-3.0. For more see the LICENCE file.
+
+This module is forked from @silver-xu's work in [https://github.com/silver-xu/deno-aws-sign-v4]. Many thanks to them. This fork has some large feature improvements and bug fixes, and has tests.
