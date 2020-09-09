@@ -8,7 +8,7 @@ const AWS4: Uint8Array = encode("AWS4", "utf8");
  */
 export const signAwsV4 = (
   key: string | Uint8Array,
-  msg: string
+  msg: string,
 ): string | Uint8Array => {
   return hmac("sha256", key, msg, undefined, "hex");
 };
@@ -24,7 +24,7 @@ export const getSignatureKey = (
   key: string | Uint8Array,
   dateStamp: string,
   region: string,
-  service: string
+  service: string,
 ): string | Uint8Array => {
   if (typeof key === "string") {
     key = encode(key, "utf8") as Uint8Array;
@@ -39,7 +39,7 @@ export const getSignatureKey = (
     "sha256",
     paddedKey,
     dateStamp as string,
-    "utf8"
+    "utf8",
   ) as Uint8Array;
 
   mac = hmac("sha256", mac, region, "utf8") as Uint8Array;
