@@ -1,9 +1,9 @@
-# deno_aws_signer_v4
+# deno_aws_sign_v4
 
 ![ci](https://github.com/lucacasonato/deno_aws_sign_v4/workflows/ci/badge.svg)
 [![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/aws_sign_v4@0.1.0/mod.ts)
 
-> Generates AWS Signature V4 for AWS low-level REST APIs.
+Generates AWS Signature V4 for AWS low-level REST APIs.
 
 ## Example
 
