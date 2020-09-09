@@ -1,4 +1,4 @@
-name: CI
+name: ci
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
         unstable: [false, true]
     steps:
       - name: Setup Deno environment
-        uses: denolib/setup-deno@v1.3.0
+        uses: denolib/setup-deno@v2.2.0
         with:
           deno-version: ${{ matrix.deno-version }}
 
