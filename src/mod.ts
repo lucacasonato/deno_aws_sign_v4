@@ -26,7 +26,8 @@ export class AWSSignerV4 {
     service: string,
     url: string,
     method: string = "GET",
-    body?: string
+    headers: { [key: string]: string },
+    body?: Uint8Array | string,
   ): RequestHeaders => {
     const date = new Date();
     const amzdate = toAmz(date);
@@ -36,51 +37,59 @@ export class AWSSignerV4 {
     const { host, pathname, searchParams } = urlObj;
     const canonicalQuerystring = searchParams.toString();
 
-    const canonicalHeaders = `host:${host}\nx-amz-date:${amzdate}\n`;
-    const signedHeaders = "host;x-amz-date";
+    headers["x-amz-date"] = amzdate;
+    if (this.credentials.sessionToken) {
+      headers["x-amz-security-token"] = this.credentials.sessionToken;
+    }
 
+    headers["host"] = host;
+
+    let canonicalHeaders = "";
+    let signedHeaders = "";
+    for (const key of Object.keys(headers).sort()) {
+      canonicalHeaders += `${key.toLowerCase()}:${headers[key]}\n`;
+      signedHeaders += `${key.toLowerCase()};`;
+    }
+    signedHeaders = signedHeaders.substring(0, signedHeaders.length - 1);
     const payload = body ?? "";
     const payloadHash = sha256(payload, "utf8", "hex") as string;
 
     const { awsAccessKeyId, awsSecretKey } = this.credentials;
 
-    const canonicalRequest = `${method}\n${pathname}\n${canonicalQuerystring}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+    const canonicalRequest =
+      `${method}\n${pathname}\n${canonicalQuerystring}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
     const canonicalRequestDigest = sha256(
       canonicalRequest,
       "utf8",
-      "hex"
+      "hex",
     ) as string;
 
     const algorithm = "AWS4-HMAC-SHA256";
-    const credentialScope = `${datestamp}/${this.region}/${service}/aws4_request`;
-    const stringToSign = `${algorithm}\n${amzdate}\n${credentialScope}\n${canonicalRequestDigest}`;
+    const credentialScope =
+      `${datestamp}/${this.region}/${service}/aws4_request`;
+    const stringToSign =
+      `${algorithm}\n${amzdate}\n${credentialScope}\n${canonicalRequestDigest}`;
 
     const signingKey = getSignatureKey(
       awsSecretKey,
       datestamp,
       this.region,
-      service
+      service,
     );
 
     const signature = signAwsV4(signingKey, stringToSign);
 
-    const authHeader = `${algorithm} Credential=${awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+    const authHeader =
+      `${algorithm} Credential=${awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
-    const headers: RequestHeaders = {
-      "x-amz-date": amzdate,
-      Authorization: authHeader,
-    };
-
-    const sessionToken = Deno.env.get("AWS_SESSION_TOKEN");
-    if (sessionToken) {
-      headers["X-Amz-Security-Token"] = sessionToken;
-    }
+    headers.Authorization = authHeader;
 
     return headers;
   };
 
-  private getDefaultCredentials = () => {
-    const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = Deno.env.toObject();
+  private getDefaultCredentials = (): Credentials => {
+    const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN } = Deno
+      .env.toObject();
     if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
       throw new Error("Invalid Credentials");
     }
@@ -88,10 +97,11 @@ export class AWSSignerV4 {
     return {
       awsAccessKeyId: AWS_ACCESS_KEY_ID,
       awsSecretKey: AWS_SECRET_ACCESS_KEY,
+      sessionToken: AWS_SESSION_TOKEN,
     };
   };
 
-  private getDefaultRegion = () => {
+  private getDefaultRegion = (): string => {
     const { AWS_REGION } = Deno.env.toObject();
     if (!AWS_REGION) {
       throw new Error("Invalid Region");
