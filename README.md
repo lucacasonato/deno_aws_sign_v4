@@ -18,17 +18,15 @@ The below example will generate signed headers based on the region and credentia
 import { AWSSignerV4 } from "https://deno.land/x/aws_sign_v4@0.1.0/mod.ts";
 
 const signer = new AWSSignerV4();
-const url = "https://test-bucket.s3.amazonaws.com/test";
-const method = "PUT";
-const body = new TextEncoder().encode("Hello World!")
-const headers = { "content-length": body.length };
-const signedHeaders = signer.sign("s3", url, method, headers, body);
-
-const response = await fetch(url, {
-   headers: signedHeaders,
-   method,
-   body: payload,
+const body = new TextEncoder().encode("Hello World!");
+const request = new Request("https://test-bucket.s3.amazonaws.com/test", {
+  method: "PUT",
+  headers: { "content-length": body.length.toString() },
+  body,
 });
+const req = await signer.sign("s3", request);
+
+const response = await fetch(req);
 ```
 
 You can also explicitly specify credentials and a region when constructing a new `AWSSignerV4`:

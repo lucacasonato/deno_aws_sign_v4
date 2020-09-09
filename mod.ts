@@ -2,6 +2,7 @@ import { sha256Hex } from "./deps.ts";
 import { toAmz, toDateStamp } from "./src/date.ts";
 import { getSignatureKey, signAwsV4 } from "./src/signing.ts";
 import type { Credentials, RequestHeaders } from "./src/types.ts";
+import { equal } from "https://deno.land/std@0.68.0/testing/asserts.ts";
 export type { Credentials, RequestHeaders };
 
 /**
@@ -15,17 +16,14 @@ export type { Credentials, RequestHeaders };
  * 
  * ```ts 
  * const signer = new AWSSignerV4();
- * const url = "https://test-bucket.s3.amazonaws.com/test";
- * const method = "PUT";
  * const body = new TextEncoder().encode("Hello World!")
- * const headers = { "content-length": body.length };
- * const signedHeaders = signer.sign("s3", url, method, headers, body);
- * 
- * const response = await fetch(url, {
- *   headers: signedHeaders,
- *   method,
- *   body: payload,
+ * const request = new Request("https://test-bucket.s3.amazonaws.com/test", {
+ *   method: "PUT",
+ *   headers: { "content-length": body.length.toString() },
+ *   body,
  * });
+ * const req = await signer.sign("s3", request);
+ * const response = await fetch(req);
  * ```
  */
 export class AWSSignerV4 {
@@ -44,6 +42,7 @@ export class AWSSignerV4 {
     this.region = region || this.#getDefaultRegion();
     this.credentials = credentials || this.#getDefaultCredentials();
   }
+
   /**
    * Use this to create the signed headers required to
    * make a call to an AWS API.
@@ -55,42 +54,42 @@ export class AWSSignerV4 {
    * @param body The body for PUT/POST methods.
    * @returns {RequestHeaders} - the signed request headers
    */
-  public sign = (
+  public async sign(
     service: string,
-    url: string,
-    method: string = "GET",
-    headers: RequestHeaders,
-    body?: Uint8Array | string,
-  ): RequestHeaders => {
+    request: Request,
+  ): Promise<Request> {
     const date = new Date();
     const amzdate = toAmz(date);
     const datestamp = toDateStamp(date);
 
-    const urlObj = new URL(url);
+    const urlObj = new URL(request.url);
     const { host, pathname, searchParams } = urlObj;
     const canonicalQuerystring = searchParams.toString();
 
-    headers["x-amz-date"] = amzdate;
-    if (this.credentials.sessionToken) {
-      headers["x-amz-security-token"] = this.credentials.sessionToken;
-    }
+    const headers = new Headers(request.headers);
 
-    headers["host"] = host;
+    headers.set("x-amz-date", amzdate);
+    if (this.credentials.sessionToken) {
+      headers.set("x-amz-security-token", this.credentials.sessionToken);
+    }
+    headers.set("host", host);
 
     let canonicalHeaders = "";
     let signedHeaders = "";
-    for (const key of Object.keys(headers).sort()) {
-      canonicalHeaders += `${key.toLowerCase()}:${headers[key]}\n`;
+    for (const key of [...headers.keys()].sort()) {
+      canonicalHeaders += `${key.toLowerCase()}:${headers.get(key)}\n`;
       signedHeaders += `${key.toLowerCase()};`;
     }
     signedHeaders = signedHeaders.substring(0, signedHeaders.length - 1);
-    const payload = body ?? "";
-    const payloadHash = sha256Hex(payload);
+    const body = request.body
+      ? new Uint8Array(await request.arrayBuffer())
+      : new Uint8Array();
+    const payloadHash = sha256Hex(body);
 
     const { awsAccessKeyId, awsSecretKey } = this.credentials;
 
     const canonicalRequest =
-      `${method}\n${pathname}\n${canonicalQuerystring}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+      `${request.method}\n${pathname}\n${canonicalQuerystring}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
     const canonicalRequestDigest = sha256Hex(canonicalRequest);
 
     const algorithm = "AWS4-HMAC-SHA256";
@@ -111,10 +110,27 @@ export class AWSSignerV4 {
     const authHeader =
       `${algorithm} Credential=${awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
-    headers.Authorization = authHeader;
+    headers.set("Authorization", authHeader);
 
-    return headers;
-  };
+    const req = new Request(
+      request.url,
+      {
+        headers,
+        method: request.method,
+        body,
+        cache: request.cache,
+        credentials: request.credentials,
+        integrity: request.integrity,
+        keepalive: request.keepalive,
+        mode: request.mode,
+        redirect: request.redirect,
+        referrer: request.referrer,
+        referrerPolicy: request.referrerPolicy,
+        signal: request.signal,
+      },
+    );
+    return req;
+  }
 
   #getDefaultCredentials = (): Credentials => {
     const AWS_ACCESS_KEY_ID = Deno.env.get("AWS_ACCESS_KEY_ID");
