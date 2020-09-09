@@ -1,9 +1,15 @@
 import { sha256Hex } from "./deps.ts";
 import { toAmz, toDateStamp } from "./src/date.ts";
 import { getSignatureKey, signAwsV4 } from "./src/signing.ts";
-import type { Credentials, RequestHeaders } from "./src/types.ts";
-import { equal } from "https://deno.land/std@0.68.0/testing/asserts.ts";
-export type { Credentials, RequestHeaders };
+
+/**
+ * The AWS credentials to use for signing.
+ */
+export interface Credentials {
+  awsAccessKeyId: string;
+  awsSecretKey: string;
+  sessionToken?: string;
+}
 
 /**
  * This class can be used to create AWS Signature V4
