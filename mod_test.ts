@@ -81,5 +81,5 @@ Deno.test("example", async () => {
     headers: { "content-length": body.length.toString() },
     body,
   });
-  const req = await signer.sign("s3", request);
+  const _req = await signer.sign("s3", request);
 });
