@@ -1,5 +1,6 @@
-import { hmac, encode } from "./deps.ts";
-const AWS4: Uint8Array = encode("AWS4", "utf8");
+import { hmac } from "../deps.ts";
+const encoder = new TextEncoder();
+const AWS4: Uint8Array = encoder.encode("AWS4");
 
 /**
  * @param  {string|Uint8Array} key - the key to sign aws v4 signature
@@ -27,7 +28,7 @@ export const getSignatureKey = (
   service: string,
 ): string | Uint8Array => {
   if (typeof key === "string") {
-    key = encode(key, "utf8") as Uint8Array;
+    key = encoder.encode(key);
   }
 
   const paddedKey: Uint8Array = new Uint8Array(4 + key.byteLength);

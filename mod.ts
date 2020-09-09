@@ -1,7 +1,7 @@
-import { sha256 } from "./deps.ts";
-import { toAmz, toDateStamp } from "./date.ts";
-import { getSignatureKey, signAwsV4 } from "./signing.ts";
-import type { Credentials, RequestHeaders } from "./types.ts";
+import { sha256Hex } from "./deps.ts";
+import { toAmz, toDateStamp } from "./src/date.ts";
+import { getSignatureKey, signAwsV4 } from "./src/signing.ts";
+import type { Credentials, RequestHeaders } from "./src/types.ts";
 
 export class AWSSignerV4 {
   private region: string;
@@ -52,17 +52,13 @@ export class AWSSignerV4 {
     }
     signedHeaders = signedHeaders.substring(0, signedHeaders.length - 1);
     const payload = body ?? "";
-    const payloadHash = sha256(payload, "utf8", "hex") as string;
+    const payloadHash = sha256Hex(payload);
 
     const { awsAccessKeyId, awsSecretKey } = this.credentials;
 
     const canonicalRequest =
       `${method}\n${pathname}\n${canonicalQuerystring}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
-    const canonicalRequestDigest = sha256(
-      canonicalRequest,
-      "utf8",
-      "hex",
-    ) as string;
+    const canonicalRequestDigest = sha256Hex(canonicalRequest);
 
     const algorithm = "AWS4-HMAC-SHA256";
     const credentialScope =
@@ -90,6 +86,7 @@ export class AWSSignerV4 {
   private getDefaultCredentials = (): Credentials => {
     const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN } = Deno
       .env.toObject();
+
     if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
       throw new Error("Invalid Credentials");
     }

@@ -1,17 +1,11 @@
-# deno-aws-signer-v4
+# deno_aws_signer_v4
 
-![ci](https://github.com/denoland/deno/workflows/ci/badge.svg)
-[![deno doc](https://doc.deno.land/badge.svg)](https://raw.githubusercontent.com/silver-xu/deno-aws-sign-v4/master/src/mod.ts)
+![ci](https://github.com/denoland/lucacasonato/deno_aws_sign_v4/ci/badge.svg)
+[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/aws_sign_v4@0.1.0/mod.ts)
 
 > Generates AWS Signature V4 for AWS low-level REST APIs.
 
-## Installation
-
-```ts
-import { AWSSignerV4 } from "https://raw.githubusercontent.com/silver-xu/deno-aws-sign-v4/master/src/mod.ts";
-```
-
-## Region & Credentials
+## Example
 
 The below example will generate signed headers based on the region and credentials in following ENV variables:
 
@@ -20,7 +14,9 @@ The below example will generate signed headers based on the region and credentia
 - AWS_SESSION_TOKEN
 - AWS_REGION
 
-```javascript
+```typescript
+import { AWSSignerV4 } from "https://deno.land/x/aws_sign_v4@0.1.0/mod.ts";
+
 const signer = new AWSSignerV4();
 const signedHeaders = signer.sign("es", endpoint, "POST", headers, payload);
 
@@ -31,25 +27,20 @@ const response = await fetch(endpoint, {
 });
 ```
 
-## Complete setup
+You can also explicitly specify credentials and a region when constructing a new `AWSSignerV4`:
 
-```javascript
-const signer = new AWSSignerV4(
-  'ap-southeast-2',  // Your real region
-  {
-    awsAccessKeyId: 1234 // Your real access key id
-    awsSecretKey: 1234 // Your real secret key
-  });
-
-const signedHeaders = signer.sign("es", endpoint, "POST", headers, payload);
-
-const response = await fetch(endpoint, {
-  headers: signedHeaders,
-  method,
-  body: payload,
+```typescript
+const signer = new AWSSignerV4("us-east-1", {
+  awsAccessKeyId: "accesskey";
+  awsSecretKey: "secretkey";
+  sessionToken: "sessiontoken";
 });
-
 ```
+
+## Related projects
+
+- [deno_s3](https://deno.land/x/s3)
+- [deno_sqs](https://deno.land/x/sqs)
 
 ---
 
