@@ -1,19 +1,24 @@
-name: CI
+name: ci
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   build:
+    name: build-${{ matrix.deno-version }}-${{ matrix.unstable && 'unstable' || 'stable' }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        deno-version: [v1.3.3, nightly]
+        unstable: [false, true]
     steps:
       - name: Setup Deno environment
-        uses: denolib/setup-deno@v1.3.0
+        uses: denolib/setup-deno@v2.2.0
         with:
-          deno-version: v1.2.0
+          deno-version: ${{ matrix.deno-version }}
 
       - uses: actions/checkout@v2
 
@@ -24,4 +29,4 @@ jobs:
         run: deno lint --unstable
 
       - name: Compile
-        run: deno cache src/mod.ts
+        run: deno cache mod.ts ${{ matrix.unstable && '--unstable' || '' }}
