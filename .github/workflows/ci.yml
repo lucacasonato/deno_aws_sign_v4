@@ -28,5 +28,5 @@ jobs:
       - name: Lint
         run: deno lint --unstable
 
-      - name: Compile
-        run: deno cache mod.ts ${{ matrix.unstable && '--unstable' || '' }}
+      - name: Test
+        run: deno test --allow-net ${{ matrix.unstable && '--unstable' || '' }}
