@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: build-${{ matrix.deno-version == 'nightly' && 'nightly' || 'stable' }}-${{ matrix.unstable && 'unstable' || 'stable' }}-${{ matrix.no-check && 'nocheck' || 'tsc' }}
+    name: build-${{ matrix.deno-version == 'nightly' && 'nightly' || 'release' }}-${{ matrix.unstable && 'unstable' || 'stable' }}-${{ matrix.no-check && 'nocheck' || 'tsc' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
