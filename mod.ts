@@ -118,7 +118,7 @@ export class AWSSignerV4 {
 
     headers.set("Authorization", authHeader);
 
-    const req = new Request(
+    return new Request(
       request.url,
       {
         headers,
@@ -135,7 +135,6 @@ export class AWSSignerV4 {
         signal: request.signal,
       },
     );
-    return req;
   }
 
   #getDefaultCredentials = (): Credentials => {
