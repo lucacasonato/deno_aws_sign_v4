@@ -2,7 +2,7 @@ import { AWSSignerV4 } from "./mod.ts";
 import {
   assertEquals,
   assertStringContains,
-} from "https://deno.land/std@0.69.0/testing/asserts.ts";
+} from "https://deno.land/std@0.71.0/testing/asserts.ts";
 
 Deno.test("construct from env vars", async () => {
   Deno.env.set("AWS_ACCESS_KEY_ID", "examplekey");
