@@ -1,6 +1,14 @@
 import { sha256Hex } from "./deps.ts";
 import { toAmz, toDateStamp } from "./src/date.ts";
+export { toAmz, toDateStamp };
 import { getSignatureKey, signAwsV4 } from "./src/signing.ts";
+
+/**
+ * Generic AWS Signer interface
+ */
+export interface Signer {
+  sign: (service: string, request: Request) => Promise<Request>;
+}
 
 /**
  * The AWS credentials to use for signing.
@@ -32,7 +40,7 @@ export interface Credentials {
  * const response = await fetch(req);
  * ```
  */
-export class AWSSignerV4 {
+export class AWSSignerV4 implements Signer {
   private region: string;
   private credentials: Credentials;
 
