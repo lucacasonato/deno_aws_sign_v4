@@ -1,7 +1,7 @@
 # deno_aws_sign_v4
 
 ![ci](https://github.com/lucacasonato/deno_aws_sign_v4/workflows/ci/badge.svg)
-[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/aws_sign_v4@0.1.3/mod.ts)
+[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/aws_sign_v4@0.1.4/mod.ts)
 
 Generates AWS Signature V4 for AWS low-level REST APIs.
 
@@ -15,7 +15,7 @@ The below example will generate signed headers based on the region and credentia
 - AWS_REGION
 
 ```typescript
-import { AWSSignerV4 } from "https://deno.land/x/aws_sign_v4@0.1.3/mod.ts";
+import { AWSSignerV4 } from "https://deno.land/x/aws_sign_v4@0.1.4/mod.ts";
 
 const signer = new AWSSignerV4();
 const body = new TextEncoder().encode("Hello World!");
