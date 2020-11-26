@@ -1,8 +1,8 @@
 import { AWSSignerV4 } from "./mod.ts";
 import {
   assertEquals,
-  assertStringContains,
-} from "https://deno.land/std@0.71.0/testing/asserts.ts";
+  assertStringIncludes,
+} from "https://deno.land/std@0.79.0/testing/asserts.ts";
 
 Deno.test("construct from env vars", async () => {
   Deno.env.set("AWS_ACCESS_KEY_ID", "examplekey");
@@ -26,14 +26,14 @@ Deno.test("construct from env vars", async () => {
   const today = `${now.getFullYear()}${
     (now.getMonth() + 1).toString().padStart(2, "0")
   }${now.getDate().toString().padStart(2, "0")}`;
-  assertStringContains(req.headers.get("x-amz-date")!, `${today}T`);
+  assertStringIncludes(req.headers.get("x-amz-date")!, `${today}T`);
   assertEquals(req.headers.get("x-amz-security-token"), "sessiontoken");
   assertEquals(req.headers.get("x-hello"), "world");
   assertEquals(
     req.headers.get("host"),
     "test.dynamodb.us-east-1.amazonaws.com",
   );
-  assertStringContains(
+  assertStringIncludes(
     req.headers.get("Authorization")!,
     `AWS4-HMAC-SHA256 Credential=examplekey/${today}/us-east-1/dynamodb/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token;x-hello, Signature=`,
   );
@@ -60,14 +60,14 @@ Deno.test("construct manually", async () => {
   const today = `${now.getFullYear()}${
     (now.getMonth() + 1).toString().padStart(2, "0")
   }${now.getDate().toString().padStart(2, "0")}`;
-  assertStringContains(req.headers.get("x-amz-date")!, `${today}T`);
+  assertStringIncludes(req.headers.get("x-amz-date")!, `${today}T`);
   assertEquals(req.headers.get("x-amz-security-token"), "session_token");
   assertEquals(req.headers.get("x-hello"), "world");
   assertEquals(
     req.headers.get("host"),
     "test.dynamodb.us-east-1.amazonaws.com",
   );
-  assertStringContains(
+  assertStringIncludes(
     req.headers.get("Authorization")!,
     `AWS4-HMAC-SHA256 Credential=example_key/${today}/us-east-2/dynamodb/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token;x-hello, Signature=`,
   );
