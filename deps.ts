@@ -1,6 +1,6 @@
-export { hmac } from "https://denopkg.com/chiefbiiko/hmac@v1.0.2/mod.ts";
+export { hmac } from "https://deno.land/x/hmac@v2.0.1/mod.ts";
 
-import { createHash } from "https://deno.land/std@0.79.0/hash/mod.ts";
+import { createHash } from "https://deno.land/std@0.84.0/hash/mod.ts";
 export function sha256Hex(data: string | Uint8Array): string {
   const hasher = createHash("sha256");
   hasher.update(data);
