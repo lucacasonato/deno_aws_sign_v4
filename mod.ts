@@ -25,10 +25,10 @@ export interface Credentials {
  * credentials for this API using the options in the
  * constructor, or let them be aquired automatically
  * through environment variables.
- * 
+ *
  * Example usage:
- * 
- * ```ts 
+ *
+ * ```ts
  * const signer = new AWSSignerV4();
  * const body = new TextEncoder().encode("Hello World!")
  * const request = new Request("https://test-bucket.s3.amazonaws.com/test", {
@@ -47,7 +47,7 @@ export class AWSSignerV4 implements Signer {
   /**
    * If no region or credentials are specified, they will
    * automatically be aquired from environment variables.
-   * 
+   *
    * Region is aquired from `AWS_REGION`. The credentials
    * are acquired from `AWS_ACCESS_KEY_ID`,
    * `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN`.
@@ -60,18 +60,15 @@ export class AWSSignerV4 implements Signer {
   /**
    * Use this to create the signed headers required to
    * make a call to an AWS API.
-   * 
-   * @param service This is the AWS service, e.g. `s3` for s3, `dynamodb` for DynamoDB 
+   *
+   * @param service This is the AWS service, e.g. `s3` for s3, `dynamodb` for DynamoDB
    * @param url The URL for the request to sign.
    * @param request The request method of the request to sign.
    * @param headers Other headers to include while signing.
    * @param body The body for PUT/POST methods.
    * @returns {RequestHeaders} - the signed request headers
    */
-  public async sign(
-    service: string,
-    request: Request,
-  ): Promise<Request> {
+  public async sign(service: string, request: Request): Promise<Request> {
     const date = new Date();
     const amzdate = toAmz(date);
     const datestamp = toDateStamp(date);
@@ -127,23 +124,20 @@ export class AWSSignerV4 implements Signer {
 
     headers.set("Authorization", authHeader);
 
-    return new Request(
-      request.url,
-      {
-        headers,
-        method: request.method,
-        body,
-        cache: request.cache,
-        credentials: request.credentials,
-        integrity: request.integrity,
-        keepalive: request.keepalive,
-        mode: request.mode,
-        redirect: request.redirect,
-        referrer: request.referrer,
-        referrerPolicy: request.referrerPolicy,
-        signal: request.signal,
-      },
-    );
+    return new Request(request.url, {
+      headers,
+      method: request.method,
+      body,
+      cache: request.cache,
+      credentials: request.credentials,
+      integrity: request.integrity,
+      keepalive: request.keepalive,
+      mode: request.mode,
+      redirect: request.redirect,
+      referrer: request.referrer,
+      referrerPolicy: request.referrerPolicy,
+      signal: request.signal,
+    });
   }
 
   #getDefaultCredentials = (): Credentials => {

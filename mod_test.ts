@@ -2,7 +2,7 @@ import { AWSSignerV4 } from "./mod.ts";
 import {
   assertEquals,
   assertStringIncludes,
-} from "https://deno.land/std@0.79.0/testing/asserts.ts";
+} from "https://deno.land/std@0.84.0/testing/asserts.ts";
 
 Deno.test("construct from env vars", async () => {
   Deno.env.set("AWS_ACCESS_KEY_ID", "examplekey");
@@ -13,18 +13,17 @@ Deno.test("construct from env vars", async () => {
   const signer = new AWSSignerV4();
   const req = await signer.sign(
     "dynamodb",
-    new Request(
-      "https://test.dynamodb.us-east-1.amazonaws.com",
-      {
-        method: "GET",
-        headers: { "x-hello": "world" },
-        body: "A dynamodb request!",
-      },
-    ),
+    new Request("https://test.dynamodb.us-east-1.amazonaws.com", {
+      method: "GET",
+      headers: { "x-hello": "world" },
+      body: "A dynamodb request!",
+    }),
   );
   const now = new Date();
   const today = `${now.getFullYear()}${
-    (now.getMonth() + 1).toString().padStart(2, "0")
+    (now.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")
   }${now.getDate().toString().padStart(2, "0")}`;
   assertStringIncludes(req.headers.get("x-amz-date")!, `${today}T`);
   assertEquals(req.headers.get("x-amz-security-token"), "sessiontoken");
@@ -47,18 +46,17 @@ Deno.test("construct manually", async () => {
   });
   const req = await signer.sign(
     "dynamodb",
-    new Request(
-      "https://test.dynamodb.us-east-1.amazonaws.com",
-      {
-        method: "GET",
-        headers: { "x-hello": "world" },
-        body: "A dynamodb request!",
-      },
-    ),
+    new Request("https://test.dynamodb.us-east-1.amazonaws.com", {
+      method: "GET",
+      headers: { "x-hello": "world" },
+      body: "A dynamodb request!",
+    }),
   );
   const now = new Date();
   const today = `${now.getFullYear()}${
-    (now.getMonth() + 1).toString().padStart(2, "0")
+    (now.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")
   }${now.getDate().toString().padStart(2, "0")}`;
   assertStringIncludes(req.headers.get("x-amz-date")!, `${today}T`);
   assertEquals(req.headers.get("x-amz-security-token"), "session_token");
