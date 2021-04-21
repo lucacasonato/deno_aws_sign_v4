@@ -16,7 +16,6 @@ Deno.test("construct from env vars", async () => {
     new Request("https://test.dynamodb.us-east-1.amazonaws.com", {
       method: "GET",
       headers: { "x-hello": "world" },
-      body: "A dynamodb request!",
     }),
   );
   const now = new Date();
@@ -49,7 +48,6 @@ Deno.test("construct manually", async () => {
     new Request("https://test.dynamodb.us-east-1.amazonaws.com", {
       method: "GET",
       headers: { "x-hello": "world" },
-      body: "A dynamodb request!",
     }),
   );
   const now = new Date();

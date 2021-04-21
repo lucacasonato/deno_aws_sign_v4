@@ -127,16 +127,6 @@ export class AWSSignerV4 implements Signer {
     return new Request(request.url, {
       headers,
       method: request.method,
-      body,
-      cache: request.cache,
-      credentials: request.credentials,
-      integrity: request.integrity,
-      keepalive: request.keepalive,
-      mode: request.mode,
-      redirect: request.redirect,
-      referrer: request.referrer,
-      referrerPolicy: request.referrerPolicy,
-      signal: request.signal,
     });
   }
 
