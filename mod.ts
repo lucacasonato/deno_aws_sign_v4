@@ -95,8 +95,8 @@ export class AWSSignerV4 implements Signer {
     signedHeaders = signedHeaders.substring(0, signedHeaders.length - 1);
     const body = request.body
       ? new Uint8Array(await request.arrayBuffer())
-      : new Uint8Array();
-    const payloadHash = sha256Hex(body);
+      : null;
+    const payloadHash = sha256Hex(body ?? new Uint8Array());
 
     const { awsAccessKeyId, awsSecretKey } = this.credentials;
 
@@ -128,15 +128,7 @@ export class AWSSignerV4 implements Signer {
       headers,
       method: request.method,
       body,
-      cache: request.cache,
-      credentials: request.credentials,
-      integrity: request.integrity,
-      keepalive: request.keepalive,
-      mode: request.mode,
       redirect: request.redirect,
-      referrer: request.referrer,
-      referrerPolicy: request.referrerPolicy,
-      signal: request.signal,
     });
   }
 

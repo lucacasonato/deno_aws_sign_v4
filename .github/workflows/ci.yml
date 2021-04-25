@@ -8,18 +8,18 @@ on:
 
 jobs:
   build:
-    name: build-${{ matrix.deno-version == 'nightly' && 'nightly' || 'release' }}-${{ matrix.unstable && 'unstable' || 'stable' }}-${{ matrix.no-check && 'nocheck' || 'tsc' }}
+    name: build-${{ matrix.deno-version == 'canary' && 'canary' || 'release' }}-${{ matrix.unstable && 'unstable' || 'stable' }}-${{ matrix.no-check && 'nocheck' || 'tsc' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        deno-version: [v1.x, nightly]
+        deno-version: [v1.x, canary]
         unstable: [false, true]
         no-check: [false, true]
     steps:
-      - name: Setup Deno environment
-        uses: denolib/setup-deno@v2.3.0
+      - name: Setup Deno
+        uses: denoland/setup-deno@main
         with:
-          deno-version: ${{ matrix.deno-version }}
+          deno-version: ${{ matrix.deno }}
 
       - uses: actions/checkout@v2
 
