@@ -2,7 +2,7 @@ import { AWSSignerV4 } from "./mod.ts";
 import {
   assertEquals,
   assertStringIncludes,
-} from "https://deno.land/std@0.84.0/testing/asserts.ts";
+} from "https://deno.land/std@0.95.0/testing/asserts.ts";
 
 Deno.test("construct from env vars", async () => {
   Deno.env.set("AWS_ACCESS_KEY_ID", "examplekey");
@@ -14,7 +14,7 @@ Deno.test("construct from env vars", async () => {
   const req = await signer.sign(
     "dynamodb",
     new Request("https://test.dynamodb.us-east-1.amazonaws.com", {
-      method: "GET",
+      method: "POST",
       headers: { "x-hello": "world" },
       body: "A dynamodb request!",
     }),
@@ -25,6 +25,8 @@ Deno.test("construct from env vars", async () => {
       .toString()
       .padStart(2, "0")
   }${now.getDate().toString().padStart(2, "0")}`;
+  assertEquals(req.method, "POST");
+  assertEquals(await req.text(), "A dynamodb request!");
   assertStringIncludes(req.headers.get("x-amz-date")!, `${today}T`);
   assertEquals(req.headers.get("x-amz-security-token"), "sessiontoken");
   assertEquals(req.headers.get("x-hello"), "world");
@@ -47,7 +49,7 @@ Deno.test("construct manually", async () => {
   const req = await signer.sign(
     "dynamodb",
     new Request("https://test.dynamodb.us-east-1.amazonaws.com", {
-      method: "GET",
+      method: "POST",
       headers: { "x-hello": "world" },
       body: "A dynamodb request!",
     }),
@@ -58,6 +60,8 @@ Deno.test("construct manually", async () => {
       .toString()
       .padStart(2, "0")
   }${now.getDate().toString().padStart(2, "0")}`;
+  assertEquals(req.method, "POST");
+  assertEquals(await req.text(), "A dynamodb request!");
   assertStringIncludes(req.headers.get("x-amz-date")!, `${today}T`);
   assertEquals(req.headers.get("x-amz-security-token"), "session_token");
   assertEquals(req.headers.get("x-hello"), "world");
