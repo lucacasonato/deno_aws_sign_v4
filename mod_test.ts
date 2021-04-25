@@ -36,7 +36,7 @@ Deno.test("construct from env vars", async () => {
   );
   assertStringIncludes(
     req.headers.get("Authorization")!,
-    `AWS4-HMAC-SHA256 Credential=examplekey/${today}/us-east-1/dynamodb/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token;x-hello, Signature=`,
+    `AWS4-HMAC-SHA256 Credential=examplekey/${today}/us-east-1/dynamodb/aws4_request, SignedHeaders=content-type;host;x-amz-date;x-amz-security-token;x-hello, Signature=`,
   );
 });
 
@@ -71,7 +71,7 @@ Deno.test("construct manually", async () => {
   );
   assertStringIncludes(
     req.headers.get("Authorization")!,
-    `AWS4-HMAC-SHA256 Credential=example_key/${today}/us-east-2/dynamodb/aws4_request, SignedHeaders=host;x-amz-date;x-amz-security-token;x-hello, Signature=`,
+    `AWS4-HMAC-SHA256 Credential=example_key/${today}/us-east-2/dynamodb/aws4_request, SignedHeaders=content-type;host;x-amz-date;x-amz-security-token;x-hello, Signature=`,
   );
 });
 
