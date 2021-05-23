@@ -1,4 +1,7 @@
-import { HmacSha256, Sha256 } from "https://deno.land/std@0.95.0/hash/sha256.ts";
+import {
+  HmacSha256,
+  Sha256,
+} from "https://deno.land/std@0.95.0/hash/sha256.ts";
 import type { Message } from "https://deno.land/std@0.95.0/hash/sha256.ts";
 
 export function sha256(data: Message): Sha256 {
