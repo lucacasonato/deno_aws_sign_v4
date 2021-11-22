@@ -1,7 +1,7 @@
-import { hex } from "./deps.ts";
 import { toAmz, toDateStamp } from "./src/date.ts";
 export { toAmz, toDateStamp };
 import { getSignatureKey, signAwsV4 } from "./src/signing.ts";
+import { sha256Hex } from "./src/util.ts";
 
 /**
  * Generic AWS Signer interface
@@ -96,15 +96,13 @@ export class AWSSignerV4 implements Signer {
     const body = request.body
       ? new Uint8Array(await request.arrayBuffer())
       : null;
-    const payloadHash = await sha256(body ?? new Uint8Array(0));
+    const payloadHash = await sha256Hex(body ?? new Uint8Array(0));
 
     const { awsAccessKeyId, awsSecretKey } = this.credentials;
 
     const canonicalRequest =
       `${request.method}\n${pathname}\n${canonicalQuerystring}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
-    const canonicalRequestDigest = await sha256(
-      new TextEncoder().encode(canonicalRequest),
-    );
+    const canonicalRequestDigest = await sha256Hex(canonicalRequest);
 
     const algorithm = "AWS4-HMAC-SHA256";
     const credentialScope =
@@ -158,10 +156,4 @@ export class AWSSignerV4 implements Signer {
 
     return AWS_REGION;
   };
-}
-
-async function sha256(data: Uint8Array): Promise<string> {
-  const hash = await crypto.subtle.digest("SHA-256", data);
-  const hexBytes = hex.encode(new Uint8Array(hash));
-  return new TextDecoder().decode(hexBytes);
 }
