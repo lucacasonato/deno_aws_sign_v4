@@ -1,4 +1,4 @@
-import { hex } from "../deps.ts";
+import { hex, hmacSha256 } from "./util.ts";
 
 const AWS4: Uint8Array = new TextEncoder().encode("AWS4");
 
@@ -12,8 +12,7 @@ export async function signAwsV4(
   msg: string,
 ): Promise<string> {
   const hash = await hmacSha256(key, msg);
-  const hexBytes = hex.encode(hash);
-  return new TextDecoder().decode(hexBytes);
+  return hex(hash);
 }
 
 /**
@@ -43,31 +42,6 @@ export async function getSignatureKey(
   mac = await hmacSha256(mac, region);
   mac = await hmacSha256(mac, service);
   mac = await hmacSha256(mac, "aws4_request");
-
-  return new Uint8Array(mac);
-}
-
-async function hmacSha256(
-  key: string | Uint8Array,
-  msg: string,
-): Promise<Uint8Array> {
-  if (typeof key === "string") {
-    key = new TextEncoder().encode(key);
-  }
-
-  const hash = await crypto.subtle.importKey(
-    "raw",
-    key,
-    { name: "HMAC", hash: { name: "SHA-256" } },
-    false,
-    ["sign"],
-  );
-
-  const mac = await crypto.subtle.sign(
-    { name: "HMAC", hash: { name: "SHA-256" } },
-    hash,
-    new TextEncoder().encode(msg),
-  );
 
   return new Uint8Array(mac);
 }
