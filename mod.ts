@@ -76,7 +76,8 @@ export class AWSSignerV4 implements Signer {
     const urlObj = new URL(request.url);
     const { host, pathname, searchParams } = urlObj;
     searchParams.sort();
-    const canonicalQuerystring = searchParams.toString();
+	// per https://docs.aws.amazon.com/general/latest/gr/create-signed-request.html#create-canonical-request
+    const canonicalQuerystring = searchParams.toString().replaceAll("+", "%20");
 
     const headers = new Headers(request.headers);
 
