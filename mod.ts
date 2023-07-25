@@ -1,7 +1,10 @@
 import { toAmz, toDateStamp } from "./src/date.ts";
+import { toCanonicalQueryString } from "./src/encodeUri.ts";
 export { toAmz, toDateStamp };
 import { getSignatureKey, signAwsV4 } from "./src/signing.ts";
 import { sha256Hex } from "./src/util.ts";
+
+export { encodeUriS3 } from "./src/encodeUri.ts";
 
 /**
  * Generic AWS Signer interface
@@ -75,9 +78,7 @@ export class AWSSignerV4 implements Signer {
 
     const urlObj = new URL(request.url);
     const { host, pathname, searchParams } = urlObj;
-    searchParams.sort();
-	// per https://docs.aws.amazon.com/general/latest/gr/create-signed-request.html#create-canonical-request
-    const canonicalQuerystring = searchParams.toString().replaceAll("+", "%20");
+    const canonicalQuerystring = toCanonicalQueryString(searchParams);
 
     const headers = new Headers(request.headers);
 
